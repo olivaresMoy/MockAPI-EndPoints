@@ -14,6 +14,7 @@ document.addEventListener("keyup", e=>{
     section = document.getElementById("listaTags");
     newTag = document.getElementById("newTag");
     span = section.getElementsByTagName("span");
+    document.getElementById("newTag").innerHTML = input.value;
     for (i = 1; i < span.length; i++) {
       text = span[i].getElementsByTagName("i")[0];
       if (text) {
@@ -27,16 +28,37 @@ document.addEventListener("keyup", e=>{
   }
 });
 
-
-// Función agregar a Panel Tag de la lista
+// Función agregar al Panel Tag de la lista
+const arrayTag2 = new Array();
 function tagAdd(idTagAdd,tagName){
-  $("#Tags").append("<span class='badge rounded-pill bg-col1 text-body-tertiary2 ms-1' id='" + tagName + idTagAdd + "'>" + tagName + " <img src='assets/img/circle-xmark-solid.png' width='15px' style='cursor: pointer;' onClick='javascript: tagRemoveTags(" + idTagAdd + ",\"" + tagName + "\")'></span>");
+  var flag = 0;
+  for (i = 0; i < arrayTag2.length; i++) {
+    if(arrayTag2[i] === tagName){
+      indice = arrayTag2.indexOf(arrayTag2[i]);
+      flag = 1;
+      console.log(indice);
+    }
+  }
+  console.log(arrayTag2);
+  if(flag === 0){
+    arrayTag2.push(tagName);
+    $("#Tags").append("<span class='badge rounded-pill bg-col1 text-body-tertiary2 ms-1' id='" + tagName + idTagAdd + "'>" + tagName + " <img src='assets/img/circle-xmark-solid.png' width='15px' style='cursor: pointer;' onClick='javascript: tagRemoveTags(" + idTagAdd + ",\"" + tagName + "\")'></span>");
+  }
+  if(flag === 1) {
+    alert("¡El tag fue añadido anteriormente!");
+  }
 }
 
 // Función para eliminar tag de la sección Tags en Panel Derecho
 function tagRemoveTags(idTagAdd,tagName){
   $("#" + tagName + idTagAdd).remove();
-
+    for (i = 0; i < arrayTag2.length; i++) {
+    if(arrayTag2[i] === tagName){
+      indiceD = arrayTag2.indexOf(arrayTag2[i]);
+      console.log(indiceD);
+    }
+  }
+  arrayTag2.splice(indiceD, 1);
 }
 
 // Eliminar tag de API
@@ -52,18 +74,22 @@ function tagDelete(idTag){
 }
 
 // Función para leer tags de la API
-$("#boton_terminar").on( "click", cargaAjax );
 $("#buscador").focus( cargaAjax );
-$("#buscador").focusout( cargaAjax );
 $( window ).on( "load", cargaAjax );
 function cargaAjax() {
     
     $.ajax({
+      async: false,
+      beforeSend: function (xhrObj) {
+          xhrObj.setRequestHeader("Authorization",
+              "Authorization");
+      },
      type: "GET",
      url: "https://64137b96a68505ea7334a07d.mockapi.io/tags",
      contentType: "application/json; charset=utf-8",
      dataType: "json",
      success: function (data) {
+      arrayTags = data;
       $('#listaTags').empty();
       $.each(data, function (i, item) {
       var rows = "<span class='tag'><span class='badge rounded-pill bg-col1 text-body-tertiary2'>" +
@@ -78,45 +104,32 @@ function cargaAjax() {
       alert(data.responseText);
      }
     });
-}
-
-
+};
 
 //Agregar datos al JSON.
+$("#boton_terminar").click( ingresarDatos );
 function ingresarDatos(){
   // datos mandados con la solicutud POST
   var value = document.getElementById('buscador').value;
   let _datos = {
-    
-    name: value, 
-    
+    name: value,
+  };
+  var found = 0;
+  for (i = 0; i < arrayTags.length; i++) {
+    if(arrayTags[i]['name'] === _datos['name']){
+      found = 1;
+    }
   }
-  
-  fetch('https://64137b96a68505ea7334a07d.mockapi.io/tags', {
-    method: "POST",
-    body: JSON.stringify(_datos),
-    headers: {"Content-type": "application/json; charset=UTF-8"}
-  })
-  .then(response => response.json()) 
-  .then(json => console.log(json));
-}
-
-mytag1 = document.getElementById('chTag');
-mytag2 = document.getElementById('chTag2');
-
-var bandera = true
-check1.addEventListener("change", function(){
-   
-   if(bandera ){
-        mytag1.style.display = '';
-        mytag2.style.display = '';
-        bandera = false
-        
-   }
-   else{
-    mytag1.style.display = 'none';
-    mytag2.style.display = 'none';
-    bandera = true
-   }
-   
-  });
+  if(found === 0){
+    fetch('https://64137b96a68505ea7334a07d.mockapi.io/tags', {
+      method: "POST",
+      body: JSON.stringify(_datos),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+    .then(response => response.json());
+  }
+  if(found === 1){
+    alert("¡Tag ya existe!");
+  }
+  cargaAjax();
+};
