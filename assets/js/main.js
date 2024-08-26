@@ -65,7 +65,7 @@ function tagRemoveTags(idTagAdd,tagName){
 var idTag;
 function tagDelete(idTag){
   // url of the data that is to be delete
-  $.ajax( 'https://64137b96a68505ea7334a07d.mockapi.io/tags/' + idTag, {
+  $.ajax( 'https://641b3d2e9b82ded29d4dbf42.mockapi.io/tags/' + idTag, {
     type : 'DELETE',
     success: function (data) {
       cargaAjax();
@@ -85,7 +85,7 @@ function cargaAjax() {
               "Authorization");
       },
      type: "GET",
-     url: "https://64137b96a68505ea7334a07d.mockapi.io/tags",
+     url: "https://641b3d2e9b82ded29d4dbf42.mockapi.io/api/tag/tags",
      contentType: "application/json; charset=utf-8",
      dataType: "json",
      success: function (data) {
@@ -93,7 +93,7 @@ function cargaAjax() {
       $('#listaTags').empty();
       $.each(data, function (i, item) {
       var rows = "<span class='tag'><span class='badge rounded-pill bg-col1 text-body-tertiary2'>" +
-      "+<a style='cursor: pointer; text-decoration: none;' onClick='javascript:tagAdd(" + item.id + ",\"" + item.name + "\")';><i>" + item.name + "</i></a>&nbsp;&nbsp;&nbsp;<a style='cursor: pointer; text-decoration: none;' onClick='javascript:tagDelete(" + item.id + ")';>✘</a></span>";
+      "+<a style='cursor: pointer; text-decoration: none;' onClick='javascript:tagAdd(" + item.id + ",\"" + item.Nombre + "\")';><i>" + item.Nombre + "</i></a>&nbsp;&nbsp;&nbsp;<a style='cursor: pointer; text-decoration: none;' onClick='javascript:tagDelete(" + item.id + ")';>✘</a></span>";
       $('#listaTags').append(rows);
       });
      },
@@ -112,16 +112,16 @@ function ingresarDatos(){
   // datos mandados con la solicutud POST
   var value = document.getElementById('buscador').value;
   let _datos = {
-    name: value,
+    Nombre: value,
   };
   var found = 0;
   for (i = 0; i < arrayTags.length; i++) {
-    if(arrayTags[i]['name'] === _datos['name']){
+    if(arrayTags[i]['Nombre'] === _datos['Nombre']){
       found = 1;
     }
   }
   if(found === 0){
-    fetch('https://64137b96a68505ea7334a07d.mockapi.io/tags', {
+    fetch('https://641b3d2e9b82ded29d4dbf42.mockapi.io/api/tag/tags', {
       method: "POST",
       body: JSON.stringify(_datos),
       headers: {"Content-type": "application/json; charset=UTF-8"}
